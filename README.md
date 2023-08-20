@@ -15,6 +15,7 @@
 <li>All your header files should be include guarded</li>
 <li>Note that we will not provide the _putchar function for this project</li>
 </ul>
+
 ## Task
 Write a function that produces output according to a format.
 
@@ -34,6 +35,7 @@ format is a character string. The format string is composed of zero or more dire
 <li>You don’t have to handle precision</li>
 <li>You don’t have to handle the length modifiers</li>
 </ul>
+
 ### Contributors
 <ul>
 <li>Seyi Alagbe</li>
