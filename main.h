@@ -12,6 +12,8 @@ typedef struct spec
 /**
  * helper.c 
  */
+int buffer_const_char(char **format, char *buffer,
+		      unsigned int *len);
 int str_len(char *str);
 int _puts(char *s);
 /**

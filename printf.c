@@ -4,31 +4,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 /**
- * buffer_const_char - puts constant format chars into buffer
- *
- * @format: format string
- * @buffer: output buffer
- * @len: length of current buffer contents
- *
- * Return: number of chars put into buffer
- */
-int buffer_const_char(char **format, char *buffer, unsigned int *len)
-{
-int printtotal = 0;
-while (**format != 0 && **format != '%')
-{
-buffer[(*len)++] = **format;
-(*format)++;
-if (*len == 1024)
-{
-write(1, buffer, 1024);
-*len = 0;
-printtotal += 1024;
-}
-}
-return (printtotal);
-}
-/**
  * int_str - converts integer to string
  * @arg: variadic arguments
  * Return: string of integer
@@ -92,7 +67,7 @@ if (f_spec == 'n')
 tmpstr[0] = 0;
 return (tmpstr);
 }
- else if (f_spec == '%')
+else if (f_spec == '%')
 {
 tmpstr[0] = '%';
 return (tmpstr);
@@ -149,7 +124,7 @@ for (i = 0; *format != '\0'; i++)
 if (*format == '%')
 {
 format++;
-specifier = *format;
+specifier = *format++;
 tmp = stringize_arg(arg, specifier);
 if (tmp == NULL)
 break;
