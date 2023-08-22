@@ -4,6 +4,79 @@
 #include <stdlib.h>
 #include <unistd.h>
 /**
+ * buffer_const_char - puts constant format chars into buffer
+ *
+ * @format: format string
+ * @buffer: output buffer
+ * @len: length of current buffer contents
+ *
+ * Return: number of chars put into buffer
+ */
+int buffer_const_char(char **format, char *buffer, unsigned int *len)
+{
+int printtotal = 0;
+while (**format != 0 && **format != '%')
+{
+buffer[(*len)++] = **format;
+(*format)++;
+if (*len == 1024)
+{
+write(1, buffer, 1024);
+*len = 0;
+printtotal += 1024;
+}
+}
+return (printtotal);
+}
+/**
+ * int_str - converts integer to string
+ * @arg: variadic arguments
+ * Return: string of integer
+ */
+char *int_str(va_list arg)
+{
+int digits;
+int j, i;
+int neg_int, absMod;
+int digitTest;
+char *conv;
+digits = va_arg(arg, int);
+digitTest = digits;
+j = 0;
+neg_int = 0;
+if (digits < 0)
+{
+neg_int = 1;
+j++;
+}
+while (digitTest != 0)
+{
+digitTest /= 10;
+j++;
+}
+conv = malloc(sizeof(char) * j + 1);
+if (neg_int)
+conv[0] = '-';
+digitTest = digits;
+for (i = j - 1; i >= 0 + neg_int; i--)
+{
+absMod = digitTest % 10;
+if (absMod < 0)
+{
+conv[i] = -absMod + '0';
+}
+else
+{
+conv[i] = absMod + '0';
+}
+digitTest /= 10;
+}
+if (conv == NULL)
+return (NULL);
+conv[j] = '\0';
+return (conv);
+}
+/**
  * stringize_arg - Sends int va_arg to needed func
  * or returns a string or char
  * @arg: va_list to pop from
@@ -14,22 +87,28 @@ char *stringize_arg(va_list arg, char f_spec)
 {
 static char tmpstr[2] = {0, 0};
 char *tmp;
-switch (f_spec)
+if (f_spec == 'n')
 {
-case 'n':
 tmpstr[0] = 0;
 return (tmpstr);
-case '%':
+}
+ else if (f_spec == '%')
+{
 tmpstr[0] = '%';
 return (tmpstr);
-case 'c':
+}
+else if (f_spec == 'c')
+{
 tmpstr[0] = (char) va_arg(arg, int);
 return (tmpstr);
-case 's':
+}
+else if (f_spec == 's')
+{
 tmp = va_arg(arg, char*);
 return (tmp);
-case 'd':
-case 'i':
+}
+else if (f_spec == 'd' || 'i')
+{
 /*if (f_spec.length == 1)
 return (lg_int_str(arg));
 if (spec.length == -1)
@@ -38,6 +117,7 @@ if (f_spec.length < 0)
 return (sh_int_str(arg));*/
 return (int_str(arg));
 }
+else
 return (NULL);
 }
 /**
@@ -51,8 +131,8 @@ unsigned int printall;
 char *tmp, *ptr, buffer[1024];
 va_list arg;
 char specifier;
-int lenr = 0;
-unsigned int len = 0;
+int i, lenr = 0;
+unsigned int len = 0, flag = 0;
 if (format == NULL)
 return (-1);
 tmp = buffer;
@@ -64,13 +144,15 @@ printall = puts(va_arg(arg, char *));
 va_end(arg);
 return (printall);
 }
-while (*format)
+for (i = 0; *format != '\0'; i++)
 {
 if (*format == '%')
 {
 format++;
 specifier = *format;
 tmp = stringize_arg(arg, specifier);
+if (tmp == NULL)
+break;
 ptr = tmp;
 while (*ptr)
 {
@@ -84,8 +166,18 @@ printall += lenr;
 len = 0;
 }
 }
+if (flag)
+free(tmp);
 }
+else
+printall += buffer_const_char(&format, buffer, &len);
 }
 va_end(arg);
+lenr = write(1, buffer, len);
+if (lenr == -1)
+return (-1);
+printall += lenr;
+if (tmp == NULL)
+return (-1);
 return (printall);
 }
